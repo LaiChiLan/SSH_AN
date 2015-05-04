@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.1.xsd 
+		
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx.xsd 
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+	<bean id="dataSource"
+		class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+		<property name="url"
+			value="jdbc:mysql://192.168.10.27:3306/test">
+		</property>
+		<property name="username" value="dio"></property>
+		<property name="password" value="lizhinan163"></property>
+	</bean>
+	
+   <bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="hibernateProperties">
+			<props>
+			
+			 <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+	          <prop key="hibernate.current_session_context_class">thread</prop> 
+		     <prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>  
+		   
+		   <!--    代替上面  <prop key="hibernate.cache.provider_class">net.sf.ehcache.hibernate.EhCacheProvider</prop> -->
+		      	<prop key="hibernate.cache.use_query_cache">false</prop>  
+		    <!--    <prop key="hibernate.jdbc.batch_size">50</prop>   -->
+			<!--     <prop key="hibernate.cache.use_second_level_cache">false</prop>   -->
+			    <prop key="hibernate.show_sql">true</prop>
+			    <prop key="hibernate.format_sql">true</prop>
+		 	 
+			      <!-- 可以自动创建数据库表(create),不创建(none) -->  
+		     	<prop key="hibernate.hbm2ddl.auto">update</prop>
+			 </props>
+		</property>
+		 	  <!-- 你要加的地方 -->  
+		 <property name="namingStrategy">  
+		     <bean class="org.hibernate.cfg.ImprovedNamingStrategy" />  
+		 </property>  
+		 <!--  其实有了packagesToScan这个参数 ,annotatedClasses这个可以不用.-->
+ 	 	<!-- <property name="annotatedClasses">
+			<list>
+			<value>com.ssh.user.model.User</value>
+			</list>
+		</property>     -->
+		<!-- 包扫描的方式加载注解类(推荐) -->
+		<!-- 扫描的类里面包含注解（spring 配置-->
+		 <property name="packagesToScan" value="com.ssh.*" />
+	</bean>
+	   <!--JDBC事务管理器,根据你的情况使用不同的事务管理器,如果工程中有Hibernate,就用Hibernate的事务管理器 -->  
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+ 	<context:annotation-config /> 
+	
+	<!-- 寮�惎Spring鐨凚ean鑷姩鎵弿鏈哄埗鏉ユ鏌ヤ笌绠＄悊Bean瀹炰緥 -->
+   	<context:component-scan base-package="com.ssh" />   
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	</beans>
+	
+ 
